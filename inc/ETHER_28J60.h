@@ -23,7 +23,7 @@
 #include <inttypes.h>
 
 void ETHER_28J60_setup(uint8_t macAddress[], uint8_t ipAddress[], uint16_t port);
-size_t ETHER_28J60_serviceRequest();		// returns a char* containing the requestString
+int ETHER_28J60_serviceRequest(uint8_t *buffer, size_t bSize);		// returns a char* containing the requestString
                             //        or NULL if no request to service
 void ETHER_28J60_print(char* text); 	// append the text to the response
 void ETHER_28J60_respond(); 			// write the final response

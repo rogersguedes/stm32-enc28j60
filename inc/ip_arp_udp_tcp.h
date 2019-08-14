@@ -35,6 +35,7 @@ void make_echo_reply_from_request(uint8_t *buf,uint16_t len);
 void make_arp_answer_from_request(uint8_t *buf);
 void make_tcp_synack_from_syn(uint8_t *buf);
 void init_len_info(uint8_t *buf);
+uint16_t get_tcp_data_len(uint8_t *buf);
 uint16_t get_tcp_data_pointer(void);
 
 void make_tcp_ack_from_any(uint8_t *buf,int16_t datlentoack,uint8_t addflags);

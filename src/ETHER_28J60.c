@@ -1,5 +1,6 @@
 #include "EtherShield.h"
 #include <ETHER_28J60.h>
+#include "ip_arp_udp_tcp.h"
 #include <string.h>
 static  uint16_t _port;
 
@@ -16,10 +17,10 @@ void ETHER_28J60_setup(uint8_t macAddress[], uint8_t ipAddress[], uint16_t port)
 }
 
 
-size_t ETHER_28J60_serviceRequest(uint8_t *buffer, size_t bSize)
+int ETHER_28J60_serviceRequest(uint8_t *buffer, size_t bSize)
 {
-	uint16_t dat_p;
-	int8_t cmd;
+	uint16_t data_idx;
+	size_t data_length, i = 0;
 	plen = ES_enc28j60PacketReceive(BUFFER_SIZE, buf);
 
 	/*plen will ne unequal to zero if there is a valid packet (without crc error) */
@@ -52,8 +53,8 @@ size_t ETHER_28J60_serviceRequest(uint8_t *buffer, size_t bSize)
 	      	if (buf[TCP_FLAGS_P] & TCP_FLAGS_ACK_V)
 			{
 	        	ES_init_len_info(buf); // init some data structures
-	        	dat_p=ES_get_tcp_data_pointer();
-	        	if (dat_p==0)
+	        	data_idx=ES_get_tcp_data_pointer();
+	        	if (data_idx==0)
 				{ // we can possibly have no data, just ack:
 	          		if (buf[TCP_FLAGS_P] & TCP_FLAGS_FIN_V)
 					{
@@ -61,29 +62,21 @@ size_t ETHER_28J60_serviceRequest(uint8_t *buffer, size_t bSize)
 	          		}
 	          		return 0;
 	        	}
-	        	if (strncmp("GET ",(char *)&(buf[dat_p]),4)!=0)
-				{
-	          		// head, post and other methods for possible status codes see:
-	            	// http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-	            	plen=ES_fill_tcp_data(buf,0,"HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<h1>200 OK</h1>");
-//					plen=ES_fill_tcp_data_p(buf,plen,PSTR("<h1>A</h1>"));
-	            	ETHER_28J60_respond();
-	          		return 0;
-	        	}
-	 			if (strncmp("/",(char *)&(buf[dat_p+4]),1)==0) // was "/ " and 2
-				{
-					// Copy the request action before we overwrite it with the response
-					size_t i = 0;
-					while (buf[dat_p+5+i] != ' ' && i < bSize)
-					{
-						buffer[i] = buf[dat_p+5+i];
-						i++;
-					}
-					buffer[i] = '\0';
-					plen=ES_fill_tcp_data(buf,0,"HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n");
-	            	ETHER_28J60_respond();
-					return i;
-	         	}
+	        	data_length=get_tcp_data_len(buf);
+
+	 			if(data_length > bSize)//error enough memory
+	 			{
+	 				return -1;
+	 			}
+	 			i=0;
+	 			while(i < bSize && i < data_length){
+					buffer[i] = buf[data_idx+i];
+					i++;
+	 			}
+	 			data_length = plen;
+	 			plen=0;
+	 			ES_make_tcp_ack_from_any(buf, 0, 0); // send ack ASAP to avoid peer retransmission
+	 			return data_length;
 	      }
 	      else
 	      {
@@ -97,7 +90,7 @@ size_t ETHER_28J60_serviceRequest(uint8_t *buffer, size_t bSize)
 void ETHER_28J60_print(char* text)
 {
 	int j = 0;
-  	while (text[j]) 
+  	while (text[j])
 	{
     	buf[TCP_CHECKSUM_L_P+3+plen]=text[j++];
     	plen++;
@@ -106,6 +99,5 @@ void ETHER_28J60_print(char* text)
 
 void ETHER_28J60_respond()
 {
-	ES_make_tcp_ack_from_any(buf, 0, 0); // send ack for http get
 	ES_make_tcp_ack_with_data(buf,plen); // send data
 }
