@@ -168,7 +168,7 @@ void ES_make_tcp_synack_from_syn(uint8_t *buf) {
 }
 
 void ES_make_tcp_ack_from_any(uint8_t *buf,int16_t datlentoack,uint8_t addflags ) {
-	void make_tcp_ack_from_any(uint8_t *buf,int16_t datlentoack,uint8_t addflags );
+	make_tcp_ack_from_any(buf, datlentoack, addflags);
 }
 
 void ES_make_tcp_ack_with_data(uint8_t *buf,uint16_t dlen ) {
