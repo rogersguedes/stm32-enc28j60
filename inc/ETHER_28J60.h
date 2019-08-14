@@ -22,19 +22,11 @@
 
 #include <inttypes.h>
 
-class ETHER_28J60
-{
-  public:
-    void setup(uint8_t macAddress[], uint8_t ipAddress[], uint16_t port);
-	char* serviceRequest();		// returns a char* containing the requestString
-								//        or NULL if no request to service
-	void print(char* text); 	// append the text to the response
-	void print(int value);  	// append the number to the response
-	void respond(); 			// write the final response
-  private:
-	uint16_t _port;
-
-};
+void ETHER_28J60_setup(uint8_t macAddress[], uint8_t ipAddress[], uint16_t port);
+size_t ETHER_28J60_serviceRequest();		// returns a char* containing the requestString
+                            //        or NULL if no request to service
+void ETHER_28J60_print(char* text); 	// append the text to the response
+void ETHER_28J60_respond(); 			// write the final response
 
 #endif
 
