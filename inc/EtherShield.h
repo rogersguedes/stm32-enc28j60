@@ -51,6 +51,7 @@
 	void ES_init_ip_arp_udp_tcp(uint8_t *mymac,uint8_t *myip,uint16_t port);
 	// for a UDP server:
 	uint8_t ES_eth_type_is_arp_and_my_ip(uint8_t *buf,uint16_t len);
+	void ES_make_arp_answer_from_request(uint8_t *buf);
 	uint8_t ES_eth_type_is_ip_and_my_ip(uint8_t *buf,uint16_t len);
 
 	void ES_make_echo_reply_from_request(uint8_t *buf,uint16_t len);

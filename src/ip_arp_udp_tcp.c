@@ -94,6 +94,7 @@ static volatile uint8_t waitgwmac=WGW_INITIAL_ARP;
 
 uint8_t macaddr[6];
 static uint8_t ipaddr[4];
+static int16_t info_hdr_len=0;
 static uint16_t info_data_len=0;
 static uint8_t seqnum=0xa; // my initial tcp sequence number
 
@@ -553,6 +554,7 @@ uint16_t get_tcp_data_len(uint8_t *buf)
 // You must call init_len_info once before calling this function
 // Not used?
 /*
+*/
  uint16_t get_tcp_data_pointer(void)
 {
         if (info_data_len){
@@ -561,12 +563,12 @@ uint16_t get_tcp_data_len(uint8_t *buf)
                 return(0);
         }
 }
-*/
 
 
 // do some basic length calculations and store the result in static varibales
 // Not used?
 /*
+*/
 void init_len_info(uint8_t *buf)
 {
         info_data_len=(((int16_t)buf[IP_TOTLEN_H_P])<<8)|(buf[IP_TOTLEN_L_P]&0xff);
@@ -577,7 +579,6 @@ void init_len_info(uint8_t *buf)
                 info_data_len=0;
         }
 }
-*/
 
 // fill a binary string of len data into the tcp packet
 uint16_t fill_tcp_data_len(uint8_t *buf,uint16_t pos, const char *s, uint16_t len)

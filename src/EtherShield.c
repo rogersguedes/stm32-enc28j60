@@ -151,6 +151,10 @@ uint8_t ES_eth_type_is_arp_and_my_ip(uint8_t *buf,uint16_t len) {
 	return eth_type_is_arp_and_my_ip(buf,len);
 }
 
+void ES_make_arp_answer_from_request(uint8_t *buf){
+	make_arp_answer_from_request(buf);
+}
+
 uint8_t ES_eth_type_is_ip_and_my_ip(uint8_t *buf,uint16_t len) {
 	return eth_type_is_ip_and_my_ip(buf, len);
 }
